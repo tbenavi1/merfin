@@ -462,11 +462,26 @@ report_results<-function(kmer_hist,kmer_hist_orig, k, container, foldername, plo
     
     }
 
-
-    one_hist <- ((2*(1-amd)*(1-(1-ahet)^k)) + (2*amd*(1-(1-ahet)^k)^2) + (2*amd*((1-ahet)^k)*(1-(1-ahet)^k))) * dnbinom(x, size = akcov   / adups, mu = akcov)   
-    two_hist <- (((1-amd)*((1-ahet)^k)) + (amd*(1-(1-ahet)^k)^2))                                             * dnbinom(x, size = akcov*2 / adups, mu = akcov * 2)
-    thr_hist <- (2*amd*((1-ahet)^k)*(1-(1-ahet)^k))                                                           * dnbinom(x, size = akcov*3 / adups, mu = akcov * 3)
-    fou_hist <- (amd*(1-ahet)^(2*k))                                                                          * dnbinom(x, size = akcov*4 / adups, mu = akcov * 4)
+    #The individual histograms come from predict2_1 (or predict1_1, predict3_1) functions in model_functions.R from GenomeScope 2.0
+    #r1 is replaced by ahet
+    #d is replaced by amd
+    #k is the same
+    r0 = 1-ahet #aa
+    t0 = r0**k #AA
+    s0 = t0 #AA
+    s1 = 1-t0 #AB
+    alpha_1 = (1-amd)*(2*s1) + amd*(2*s0*s1 + 2*s1**2)
+    alpha_2 = (1-amd)*(s0) + amd*(s1**2)
+    alpha_3 = amd*(2*s0*s1)
+    alpha_4 = amd*(s0**2)
+    one_hist = alpha_1 * dnbinom(x, size = kmercov*1 / bias, mu = kmercov*1)
+    two_hist = alpha_2 * dnbinom(x, size = kmercov*2 / bias, mu = kmercov*2)
+    thr_hist = alpha_3 * dnbinom(x, size = kmercov*3 / bias, mu = kmercov*3)
+    fou_hist = alpha_4 * dnbinom(x, size = kmercov*4 / bias, mu = kmercov*4)
+    #one_hist <- ((2*(1-amd)*(1-(1-ahet)^k)) + (2*amd*(1-(1-ahet)^k)^2) + (2*amd*((1-ahet)^k)*(1-(1-ahet)^k))) * dnbinom(x, size = akcov   / adups, mu = akcov)   
+    #two_hist <- (((1-amd)*((1-ahet)^k)) + (amd*(1-(1-ahet)^k)^2))                                             * dnbinom(x, size = akcov*2 / adups, mu = akcov * 2)
+    #thr_hist <- (2*amd*((1-ahet)^k)*(1-(1-ahet)^k))                                                           * dnbinom(x, size = akcov*3 / adups, mu = akcov * 3)
+    #fou_hist <- (amd*(1-ahet)^(2*k))                                                                          * dnbinom(x, size = akcov*4 / adups, mu = akcov * 4)
     
     total_kmers = sum(as.numeric(x)*as.numeric(y))
     unique_kmers = sum(as.numeric(x)*unique_hist)
